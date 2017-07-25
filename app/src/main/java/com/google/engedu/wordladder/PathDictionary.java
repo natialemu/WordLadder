@@ -15,6 +15,7 @@
 
 package com.google.engedu.wordladder;
 
+import android.support.v4.app.INotificationSideChannel;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -26,7 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Queue;
+import java.util.zip.CheckedInputStream;
 
 public class PathDictionary {
     private static final int MAX_WORD_LENGTH = 4;
@@ -54,8 +57,76 @@ public class PathDictionary {
     }
 
     private ArrayList<String> neighbours(String word) {
-        return new ArrayList<String>();
+
+        ArrayList<String> neighboringWords = new ArrayList<>();
+
+
+
+        Iterator<String> iterator = words.iterator();
+
+        while(iterator.hasNext()){
+            String potentialNeighbor = iterator.next();
+            if(wordsAreNeighbors(word,potentialNeighbor)){
+                neighboringWords.add(potentialNeighbor);
+            }
+        }
+        return neighboringWords;
     }
+
+    private boolean wordsAreNeighbors(String word, String potentialNeighbor) {
+        /*
+        what is best way to check if two strings differ with only one word:
+
+        1. sort them and check the length to see if only one is the difference in distance. then iterate through once to confirm. runtime O(nlogn)
+        2. create a HashTable which maps a character to its count for the longer string. then iterate through the shorter string and check
+           if every character is in the map with the corresponding value. Runtime: O(n)
+
+         */
+        HashMap<Character, Integer> mapLongerString = new HashMap<>();
+
+        if(Math.abs(potentialNeighbor.length() - word.length()) != 1){
+            return false;
+        }
+        String largerWord;
+        String smallerWord;
+        if(potentialNeighbor.length() > word.length()){
+            largerWord = potentialNeighbor;
+            smallerWord = word;
+        }else {
+            largerWord = word;
+            smallerWord = potentialNeighbor;
+        }
+        for(int i = 0; i < largerWord.length();i++)
+        {
+            if(mapLongerString.containsKey(largerWord.charAt(i))){
+                mapLongerString.put(largerWord.charAt(i),mapLongerString.get(largerWord.charAt(i))+1);
+            }else{
+                mapLongerString.put(largerWord.charAt(i),1);
+            }
+        }
+
+        HashMap<Character, Integer> mapShorterString = new HashMap<>();
+
+        for(int i = 0; i < smallerWord.length(); i++ ){
+            if(mapShorterString.containsKey(smallerWord.charAt(i))){
+                mapShorterString.put(smallerWord.charAt(i),mapShorterString.get(smallerWord.charAt(i))+1);
+            }else{
+                mapShorterString.put(smallerWord.charAt(i),1);
+            }
+
+        }
+
+        for(Character c : mapShorterString.keySet()){
+            if(!mapLongerString.containsKey(c) || mapLongerString.get(c) != mapShorterString.get(c)){
+                return false;
+            }
+        }
+        return true;
+
+        }
+
+
+
 
     public String[] findPath(String start, String end) {
         return null;
