@@ -25,9 +25,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.zip.CheckedInputStream;
 
@@ -66,7 +68,7 @@ public class PathDictionary {
 
         while(iterator.hasNext()){
             String potentialNeighbor = iterator.next();
-            if(wordsAreNeighbors(word,potentialNeighbor)){
+            if(wordsAreNeighbors(word.toLowerCase(),potentialNeighbor.toLowerCase())){
                 neighboringWords.add(potentialNeighbor);
             }
         }
@@ -129,6 +131,32 @@ public class PathDictionary {
 
 
     public String[] findPath(String start, String end) {
-        return null;
+
+        List<String> wordsInPath = new ArrayList<>();
+        wordsInPath.add(start);
+        boolean foundTarget = false;
+        Queue<String> bfs = new ArrayDeque<>();
+        bfs.add(start);
+        String currentWord = start;
+        while(!bfs.isEmpty()){
+            ArrayList<String> wordsNeighbors = neighbours(currentWord);
+            Collections.sort(wordsNeighbors);
+            bfs.addAll(wordsNeighbors);
+            currentWord = bfs.poll();
+            wordsInPath.add(currentWord);
+            if(currentWord.equals(end)) {
+                Collections.reverse(wordsInPath);
+                foundTarget = true;
+                break;
+            }
+
+        }
+        if(!foundTarget){
+            return null;
+        }
+
+        String[] wordLadderSolution = wordsInPath.toArray(new String[wordsInPath.size()]);
+
+        return wordLadderSolution;
     }
 }
