@@ -15,7 +15,6 @@
 
 package com.google.engedu.wordladder;
 
-import android.support.v4.app.INotificationSideChannel;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -31,7 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
-import java.util.zip.CheckedInputStream;
 
 public class PathDictionary {
     private static final int MAX_WORD_LENGTH = 4;
