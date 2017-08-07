@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,10 @@ import java.io.InputStream;
 public class WordSelectionActivity extends AppCompatActivity {
 
     private PathDictionary dictionary;
+
+    private final String PATH_KEY = "path";
+    private final String STARTING_WORD_KEY = "firstWord";
+    private final String ENDING_WORD_KEY = "endingWord";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +58,25 @@ public class WordSelectionActivity extends AppCompatActivity {
     }
 
     public boolean onStart(View view) {
-        TextView startWordView = (TextView) findViewById(R.id.startWord);
-        TextView endWordView = (TextView) findViewById(R.id.endWord);
+        EditText startWordView = (EditText) findViewById(R.id.startWord);
+        EditText endWordView = (EditText) findViewById(R.id.endWord);
         String[] words = dictionary.findPath(
                 startWordView.getText().toString().toLowerCase(),
                 endWordView.getText().toString().toLowerCase());
         if (words != null) {
             // TODO: Launch new activity here
+            //call a new activity
+            /*
+            Intent intent = new Intent(this,WordLadderActivity.class);
+            intent.putExtra(PATH_KEY,words);
+            intent.putExtra(STARTING_WORD_KEY,startWordView.getText().toString());
+            intent.putExtra(ENDING_WORD_KEY,endWordView.getText().toString());
+
+            startActivity(intent);*/
+            Toast toast = Toast.makeText(this, "Found a path between the two given words",
+                    Toast.LENGTH_SHORT);
+            toast.show();
+            //pass
         } else {
             Log.i("Word ladder", "Word combination is not possible");
             Toast toast = Toast.makeText(this, "Couldn't find path between the two given words",
