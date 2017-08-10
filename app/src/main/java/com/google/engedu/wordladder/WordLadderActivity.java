@@ -9,7 +9,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -23,6 +26,8 @@ import com.google.engedu.worldladder.R;
 import org.w3c.dom.Text;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WordLadderActivity extends AppCompatActivity {
 
@@ -36,7 +41,7 @@ public class WordLadderActivity extends AppCompatActivity {
     // the array of paths
     //the start word
     //the final word
-    private String[] path;
+    private Set<String> path;
     private String startWord;
     private String endWord;
 
@@ -47,9 +52,16 @@ public class WordLadderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word_ladder);
 
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
 
         Intent intent = getIntent();
-        path = intent.getStringArrayExtra(PATH_KEY);
+        String[] paths = intent.getStringArrayExtra(PATH_KEY);
+        path = new HashSet<>();
+        for(String p: paths){
+            path.add(p);
+        }
         startWord = intent.getStringExtra(STARTING_WORD_KEY);
         endWord = intent.getStringExtra(ENDING_WORD_KEY);
 
@@ -71,7 +83,7 @@ public class WordLadderActivity extends AppCompatActivity {
 
 
 
-        editTexts = new EditText[path.length - 2];
+        editTexts = new EditText[path.size() - 2];
 
         for(int i =0; i < editTexts.length;i++){
             editTexts[i] = new EditText(this);
@@ -93,18 +105,23 @@ public class WordLadderActivity extends AppCompatActivity {
         linearLayout.addView(secondTextView);
 
 
-        FrameLayout floatingActionButtonLayout = (FrameLayout)(findViewById(R.id.fabFrame));
+       /* FrameLayout floatingActionButtonLayout = (FrameLayout)(findViewById(R.id.fabFrame));
 
         CoordinatorLayout coordinatorLayout = (CoordinatorLayout)findViewById(R.id.activity_word_ladder
         );
 
-        coordinatorLayout.addView(floatingActionButtonLayout);
+        linearLayout.addView(floatingActionButtonLayout);*/
 
         FloatingActionButton floatingActionButton = (FloatingActionButton)findViewById(R.id.mainFab);
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(gameSolved()){
+                    Toast.makeText(getApplicationContext(),"Congrats! You solved it",Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),"Tough luck! Try again",Toast.LENGTH_LONG).show();
+                }
 
             }
         });
@@ -119,11 +136,44 @@ public class WordLadderActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_word_selection, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if(id == R.id.game_help){
+            Intent intent = new Intent(this, HelpActivity.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    private boolean gameSolved() {
+        for(EditText editText: editTexts){
+            if(!path.contains(editText.getText().toString())){
+
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void createEditText(ViewGroup layout) {
 
 
         LinearLayout.LayoutParams textInputLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
 
 
         TextInputLayout.LayoutParams textLayoutParams = new TextInputLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -133,11 +183,11 @@ public class WordLadderActivity extends AppCompatActivity {
 
         //add the edit Texts in the textInput Layoout
 
-        for(int i = 1; i < path.length-1;i++){
+        for (int i = 1; i < path.size() - 1; i++) {
             TextInputLayout textInputLayout = new TextInputLayout(this);
             textInputLayout.setLayoutParams(textInputLayoutParams);
 
-            EditText editText = editTexts[i-1];
+            EditText editText = editTexts[i - 1];
             //editText.setText(path[i]);
             editText.setHint("Enter answer");
             editText.setHintTextColor(getResources().getColor(R.color.colorAccent));
