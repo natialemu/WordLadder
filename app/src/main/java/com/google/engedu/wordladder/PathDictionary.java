@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,20 +30,23 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
 import java.util.zip.CheckedInputStream;
 
 public class PathDictionary {
     private static final int MAX_WORD_LENGTH = 4;
     private static HashSet<String> words = new HashSet<>();
+    private HashMap<String,String> edgeTo;
 
     public PathDictionary(InputStream inputStream) throws IOException {
         if (inputStream == null) {
             return;
         }
-        Log.i("Word ladder", "Loading dict");
+        //Log.i("Word ladder", "Loading dict");
         BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
-        Log.i("Word ladder", "Loading dict");
+        //Log.i("Word ladder", "Loading dict");
         while((line = in.readLine()) != null) {
             String word = line.trim();
             if (word.length() > MAX_WORD_LENGTH) {
@@ -52,6 +54,7 @@ public class PathDictionary {
             }
             words.add(word);
         }
+        edgeTo = new HashMap<>();
     }
 
     public boolean isWord(String word) {
@@ -75,89 +78,70 @@ public class PathDictionary {
         return neighboringWords;
     }
 
-    private boolean wordsAreNeighbors(String word, String potentialNeighbor) {
+    public boolean wordsAreNeighbors(String word, String potentialNeighbor) {
         /*
         what is best way to check if two strings differ with only one word:
 
-        1. sort them and check the length to see if only one is the difference in distance. then iterate through once to confirm. runtime O(nlogn)
-        2. create a HashTable which maps a character to its count for the longer string. then iterate through the shorter string and check
-           if every character is in the map with the corresponding value. Runtime: O(n)
-
+            their length must be the same
+            go throgh one of them, compare how many
          */
-        HashMap<Character, Integer> mapLongerString = new HashMap<>();
 
-        if(Math.abs(potentialNeighbor.length() - word.length()) != 1){
+        //firs
+        if(word.length() != potentialNeighbor.length()){
             return false;
         }
-        String largerWord;
-        String smallerWord;
-        if(potentialNeighbor.length() > word.length()){
-            largerWord = potentialNeighbor;
-            smallerWord = word;
-        }else {
-            largerWord = word;
-            smallerWord = potentialNeighbor;
-        }
-        for(int i = 0; i < largerWord.length();i++)
-        {
-            if(mapLongerString.containsKey(largerWord.charAt(i))){
-                mapLongerString.put(largerWord.charAt(i),mapLongerString.get(largerWord.charAt(i))+1);
-            }else{
-                mapLongerString.put(largerWord.charAt(i),1);
+        int characterDifference = 0;
+        for(int i = 0; i < word.length(); i++){
+            if(word.charAt(i) != potentialNeighbor.charAt(i)){
+                characterDifference++;
             }
         }
-
-        HashMap<Character, Integer> mapShorterString = new HashMap<>();
-
-        for(int i = 0; i < smallerWord.length(); i++ ){
-            if(mapShorterString.containsKey(smallerWord.charAt(i))){
-                mapShorterString.put(smallerWord.charAt(i),mapShorterString.get(smallerWord.charAt(i))+1);
-            }else{
-                mapShorterString.put(smallerWord.charAt(i),1);
-            }
-
-        }
-
-        for(Character c : mapShorterString.keySet()){
-            if(!mapLongerString.containsKey(c) || mapLongerString.get(c) != mapShorterString.get(c)){
-                return false;
-            }
+        if(characterDifference != 1){
+            return false;
         }
         return true;
 
+
+    }
+
+
+
+
+    public List<String> findPath(String start, String end) {
+
+        bfs(start,end);
+
+
+        Stack<String> path = new Stack<String>();
+        String x;
+        for(x = end; !x.equals(start);x=edgeTo.get(x)){
+            path.push(x);
+
         }
+        path.push(x);
+
+        return path;
 
 
 
-
-    public String[] findPath(String start, String end) {
-
-        List<String> wordsInPath = new ArrayList<>();
-        boolean foundTarget = false;
-        Queue<String> bfs = new ArrayDeque<>();
-        bfs.add(start);
-        String currentWord = start;
-        while(!bfs.isEmpty()){
-            ArrayList<String> wordsNeighbors = neighbours(currentWord);
-            Collections.sort(wordsNeighbors);
-            bfs.addAll(wordsNeighbors);
-            currentWord = bfs.poll();
-
-            if(currentWord.equals(end)) {
-                Collections.reverse(wordsInPath);
-                foundTarget = true;
-                break;
+    }
+    private void bfs(String start, String end){
+        Set<String> visited = new HashSet<>();
+        List<String> queue = new ArrayList<>();
+        visited.add(start);
+        queue.add(start);
+        while(!queue.isEmpty()){
+            String v = queue.remove(0);
+            for(String w : neighbours(v)){
+                if(!visited.contains(w)){
+                    edgeTo.put(w,v);
+                    if(w.equals(end)){
+                        return;
+                    }
+                    visited.add(w);
+                    queue.add(w);
+                }
             }
-
-            wordsInPath.add(currentWord);
-
         }
-        if(!foundTarget){
-            return null;
-        }
-
-        String[] wordLadderSolution = wordsInPath.toArray(new String[wordsInPath.size()]);
-
-        return wordLadderSolution;
     }
 }

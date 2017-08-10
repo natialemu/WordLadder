@@ -1,19 +1,28 @@
 package com.google.engedu.wordladder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.engedu.worldladder.R;
 
 import org.w3c.dom.Text;
+
+import java.util.Collections;
 
 public class WordLadderActivity extends AppCompatActivity {
 
@@ -38,16 +47,21 @@ public class WordLadderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word_ladder);
 
+
         Intent intent = getIntent();
         path = intent.getStringArrayExtra(PATH_KEY);
         startWord = intent.getStringExtra(STARTING_WORD_KEY);
         endWord = intent.getStringExtra(ENDING_WORD_KEY);
 
+        LinearLayout.LayoutParams textViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        textViewLayoutParams.bottomMargin = 10;
+        textViewLayoutParams.topMargin = 10;
+        textViewLayoutParams.gravity= Gravity.CENTER;
+
         TextView firstTextView = new TextView(this);
 
-        LinearLayout.LayoutParams textViewLinearLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        firstTextView.setLayoutParams(textViewLinearLayoutParams);
+        firstTextView.setLayoutParams(textViewLayoutParams);
 
         firstTextView.setText(startWord);
 
@@ -55,10 +69,7 @@ public class WordLadderActivity extends AppCompatActivity {
 
         linearLayout.addView(firstTextView);
 
-        TextInputLayout textInputLayout = new TextInputLayout(this);
 
-        LinearLayout.LayoutParams textInputLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        linearLayout.addView(textInputLayout);
 
         editTexts = new EditText[path.length - 2];
 
@@ -66,18 +77,37 @@ public class WordLadderActivity extends AppCompatActivity {
             editTexts[i] = new EditText(this);
         }
 
-        createEditText(textInputLayout);
+        createEditText(linearLayout);
+
+
 
 
 
         TextView secondTextView = new TextView(this);
 
 
-        secondTextView.setLayoutParams(textViewLinearLayoutParams);
+        secondTextView.setLayoutParams(textViewLayoutParams);
 
         secondTextView.setText(endWord);
 
         linearLayout.addView(secondTextView);
+
+
+        FrameLayout floatingActionButtonLayout = (FrameLayout)(findViewById(R.id.fabFrame));
+
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout)findViewById(R.id.activity_word_ladder
+        );
+
+        coordinatorLayout.addView(floatingActionButtonLayout);
+
+        FloatingActionButton floatingActionButton = (FloatingActionButton)findViewById(R.id.mainFab);
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         //this will need information about the size of the path, if one exits
         //a text View for the first word
         // dynamically create and populate that many edit texts
@@ -85,9 +115,16 @@ public class WordLadderActivity extends AppCompatActivity {
         //a button to submit once the person clicks all
 
 
+
+
     }
 
-    private void createEditText(TextInputLayout textInputLayout) {
+    private void createEditText(ViewGroup layout) {
+
+
+        LinearLayout.LayoutParams textInputLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+
 
         TextInputLayout.LayoutParams textLayoutParams = new TextInputLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -97,12 +134,17 @@ public class WordLadderActivity extends AppCompatActivity {
         //add the edit Texts in the textInput Layoout
 
         for(int i = 1; i < path.length-1;i++){
+            TextInputLayout textInputLayout = new TextInputLayout(this);
+            textInputLayout.setLayoutParams(textInputLayoutParams);
 
             EditText editText = editTexts[i-1];
-            editText.setText(path[i]);
-            editText.setHint("Word");
+            //editText.setText(path[i]);
+            editText.setHint("Enter answer");
             editText.setHintTextColor(getResources().getColor(R.color.colorAccent));
+            editText.setLayoutParams(textLayoutParams);
+
             textInputLayout.addView(editText);
+            layout.addView(textInputLayout);
         }
 
         //get t
