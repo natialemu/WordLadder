@@ -18,6 +18,7 @@ package com.google.engedu.wordladder;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,6 +34,7 @@ import com.google.engedu.worldladder.R;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WordSelectionActivity extends AppCompatActivity {
@@ -57,6 +59,15 @@ public class WordSelectionActivity extends AppCompatActivity {
             Toast toast = Toast.makeText(this, "Could not load dictionary", Toast.LENGTH_LONG);
             toast.show();
         }
+        FloatingActionButton floatingActionButton = (FloatingActionButton)findViewById(R.id.mainFab);
+
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onStart(view);
+            }
+        });
     }
 
     public boolean onStart(View view) {
@@ -64,11 +75,19 @@ public class WordSelectionActivity extends AppCompatActivity {
         EditText endWordView = (EditText) findViewById(R.id.endWord);
         String startWord = startWordView.getText().toString();
         String endWord = endWordView.getText().toString();
-        List<String> wordsList = dictionary.findPath(startWord, endWord);
+        List<String> wordsList = new ArrayList<>();
+        if(startWord.isEmpty() || endWord.isEmpty()){
+            Toast.makeText(this, "Please provide a valid word", Toast.LENGTH_SHORT).show();
+        }else{
+
+            wordsList = dictionary.findPath(startWord, endWord);
+
+        }
+
 
         String[] words = new String[wordsList.size()];
         words = wordsList.toArray(words);
-        if (wordsList != null) {
+        if (wordsList != null && !wordsList.isEmpty()) {
             // TODO: Launch new activity here
             //call a new activity
 

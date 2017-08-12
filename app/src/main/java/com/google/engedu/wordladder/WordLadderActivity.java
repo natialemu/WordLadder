@@ -46,6 +46,14 @@ public class WordLadderActivity extends AppCompatActivity {
     private String endWord;
 
     private EditText[] editTexts;
+    private boolean fabExpanded = false;
+    private FloatingActionButton floatingActionButton;
+
+    //Linear layout holding the Save submenu
+    private LinearLayout layoutFabSubmit;
+
+    //Linear layout holding the Edit submenu
+    private LinearLayout layoutFabGiveup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,19 +120,56 @@ public class WordLadderActivity extends AppCompatActivity {
 
         linearLayout.addView(floatingActionButtonLayout);*/
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton)findViewById(R.id.mainFab);
+        floatingActionButton = (FloatingActionButton)findViewById(R.id.mainFab);
+
+        layoutFabSubmit = (LinearLayout) findViewById(R.id.layoutFabSubmit);
+        layoutFabGiveup = (LinearLayout) findViewById(R.id.layoutFabGiveup);
+
+        closeSubMenusFab();
+
+
+        floatingActionButton.setImageResource(R.drawable.ic_add_black_24dp);
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(gameSolved()){
-                    Toast.makeText(getApplicationContext(),"Congrats! You solved it",Toast.LENGTH_LONG).show();
+                if(fabExpanded){
+                    closeSubMenusFab();
                 }else{
-                    Toast.makeText(getApplicationContext(),"Tough luck! Try again",Toast.LENGTH_LONG).show();
+                    openSubMenusFab();
                 }
+
 
             }
         });
+
+        FloatingActionButton submitFab = (FloatingActionButton)findViewById(R.id.fabSolve);
+
+        FloatingActionButton giveupFab = (FloatingActionButton)findViewById(R.id.fabGiveup);
+
+
+        submitFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(fabExpanded){
+                    if(gameSolved()){
+                        Toast.makeText(getApplicationContext(),"Congrats! You solved it",Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(getApplicationContext(),"Tough luck! Try again",Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            }
+        });
+        giveupFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(fabExpanded){
+                    onSolveClick(view);
+                }
+            }
+        });
+
         //this will need information about the size of the path, if one exits
         //a text View for the first word
         // dynamically create and populate that many edit texts
@@ -134,6 +179,10 @@ public class WordLadderActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void onSolveClick(View view) {
+        //TODO: implement solver
     }
 
     @Override
@@ -200,6 +249,21 @@ public class WordLadderActivity extends AppCompatActivity {
         //get t
     }
 
+    private void closeSubMenusFab(){
+        layoutFabSubmit.setVisibility(View.INVISIBLE);
+        layoutFabGiveup.setVisibility(View.INVISIBLE);
+
+        floatingActionButton.setBackgroundResource(R.drawable.ic_add_black_24dp);
+        fabExpanded = false;
+    }
+
+    //Opens FAB submenus
+    private void openSubMenusFab() {
+        layoutFabSubmit.setVisibility(View.VISIBLE);
+        layoutFabGiveup.setVisibility(View.VISIBLE);
+        floatingActionButton.setBackgroundResource(R.drawable.ic_close_black_24dp);
+        fabExpanded = true;
+    }
 
     //on click handler for submit
 }
