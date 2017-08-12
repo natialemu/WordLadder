@@ -14,6 +14,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"
+        android:layout_marginBottom="20dp"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -40,6 +41,9 @@
 
     <include layout="@layout/content_scrolling"
         android:id="@+id/include" />
+
+    <include layout="@layout/fab_layout"
+        android:id="@+id/includeFab"/>
 
 
 

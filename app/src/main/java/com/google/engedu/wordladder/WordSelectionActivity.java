@@ -18,6 +18,7 @@ package com.google.engedu.wordladder;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,8 +31,11 @@ import android.widget.Toast;
 
 import com.google.engedu.worldladder.R;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WordSelectionActivity extends AppCompatActivity {
 
@@ -55,24 +59,44 @@ public class WordSelectionActivity extends AppCompatActivity {
             Toast toast = Toast.makeText(this, "Could not load dictionary", Toast.LENGTH_LONG);
             toast.show();
         }
+        FloatingActionButton floatingActionButton = (FloatingActionButton)findViewById(R.id.mainFab);
+
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onStart(view);
+            }
+        });
     }
 
     public boolean onStart(View view) {
         EditText startWordView = (EditText) findViewById(R.id.startWord);
         EditText endWordView = (EditText) findViewById(R.id.endWord);
-        String[] words = dictionary.findPath(
-                startWordView.getText().toString().toLowerCase(),
-                endWordView.getText().toString().toLowerCase());
-        if (words != null) {
+        String startWord = startWordView.getText().toString();
+        String endWord = endWordView.getText().toString();
+        List<String> wordsList = new ArrayList<>();
+        if(startWord.isEmpty() || endWord.isEmpty()){
+            Toast.makeText(this, "Please provide a valid word", Toast.LENGTH_SHORT).show();
+        }else{
+
+            wordsList = dictionary.findPath(startWord, endWord);
+
+        }
+
+
+        String[] words = new String[wordsList.size()];
+        words = wordsList.toArray(words);
+        if (wordsList != null && !wordsList.isEmpty()) {
             // TODO: Launch new activity here
             //call a new activity
-            /*
+
             Intent intent = new Intent(this,WordLadderActivity.class);
             intent.putExtra(PATH_KEY,words);
             intent.putExtra(STARTING_WORD_KEY,startWordView.getText().toString());
             intent.putExtra(ENDING_WORD_KEY,endWordView.getText().toString());
 
-            startActivity(intent);*/
+            startActivity(intent);
             Toast toast = Toast.makeText(this, "Found a path between the two given words",
                     Toast.LENGTH_SHORT);
             toast.show();
