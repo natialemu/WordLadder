@@ -134,7 +134,6 @@ public class PathDictionary {
     public String[] findPath(String start, String end) {
 
         List<String> wordsInPath = new ArrayList<>();
-        wordsInPath.add(start);
         boolean foundTarget = false;
         Queue<String> bfs = new ArrayDeque<>();
         bfs.add(start);
@@ -144,12 +143,14 @@ public class PathDictionary {
             Collections.sort(wordsNeighbors);
             bfs.addAll(wordsNeighbors);
             currentWord = bfs.poll();
-            wordsInPath.add(currentWord);
+
             if(currentWord.equals(end)) {
                 Collections.reverse(wordsInPath);
                 foundTarget = true;
                 break;
             }
+
+            wordsInPath.add(currentWord);
 
         }
         if(!foundTarget){
